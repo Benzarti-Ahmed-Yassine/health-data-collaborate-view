@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Users, Search, Edit, Trash2, Eye } from 'lucide-react';
+import EditPatientDialog from './EditPatientDialog';
 
 interface Patient {
   id: string;
@@ -29,6 +30,8 @@ const PatientList = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     loadPatients();
@@ -48,6 +51,15 @@ const PatientList = () => {
       title: "Patient supprimé",
       description: "Le patient a été supprimé avec succès.",
     });
+  };
+
+  const handleEditPatient = (patient: Patient) => {
+    setEditingPatient(patient);
+    setIsEditDialogOpen(true);
+  };
+
+  const handlePatientUpdated = () => {
+    loadPatients();
   };
 
   const filteredPatients = patients.filter(patient =>
@@ -205,6 +217,15 @@ const PatientList = () => {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => handleEditPatient(patient)}
+                            className="text-blue-600 hover:bg-blue-50"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => deletePatient(patient.id)}
                             className="text-red-600 hover:bg-red-50"
                           >
@@ -220,6 +241,16 @@ const PatientList = () => {
           </div>
         </CardContent>
       </Card>
+
+      <EditPatientDialog
+        patient={editingPatient}
+        isOpen={isEditDialogOpen}
+        onClose={() => {
+          setIsEditDialogOpen(false);
+          setEditingPatient(null);
+        }}
+        onPatientUpdated={handlePatientUpdated}
+      />
     </div>
   );
 };

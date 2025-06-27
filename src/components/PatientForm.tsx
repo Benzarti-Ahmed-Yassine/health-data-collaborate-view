@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Save } from 'lucide-react';
+import { UserPlus, Save, Plus } from 'lucide-react';
 
 interface Patient {
   id: string;
@@ -39,8 +38,11 @@ const PatientForm = () => {
     medicaments: '',
     notes: ''
   });
+  const [customSpecialites, setCustomSpecialites] = useState<string[]>([]);
+  const [newSpecialite, setNewSpecialite] = useState('');
+  const [showAddSpecialite, setShowAddSpecialite] = useState(false);
 
-  const specialites = [
+  const defaultSpecialites = [
     'Généraliste', 'Pédodontiste', 'Orthophoniste',
     'Pédiatre', 'Cancérologue', 'Nutritionniste',
     'Gériatre', 'Gastro-entérologue', 'Ergothérapeute',
@@ -49,6 +51,13 @@ const PatientForm = () => {
     'Cardiologue', 'Urologue',
     'Dentiste', 'Diabétologue'
   ];
+
+  useEffect(() => {
+    const savedSpecialites = JSON.parse(localStorage.getItem('customSpecialites') || '[]');
+    setCustomSpecialites(savedSpecialites);
+  }, []);
+
+  const allSpecialites = [...defaultSpecialites, ...customSpecialites];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -65,6 +74,22 @@ const PatientForm = () => {
       return (poids / (taille * taille)).toFixed(2);
     }
     return '';
+  };
+
+  const addNewSpecialite = () => {
+    if (newSpecialite.trim() && !allSpecialites.includes(newSpecialite.trim())) {
+      const updatedCustomSpecialites = [...customSpecialites, newSpecialite.trim()];
+      setCustomSpecialites(updatedCustomSpecialites);
+      localStorage.setItem('customSpecialites', JSON.stringify(updatedCustomSpecialites));
+      setFormData(prev => ({ ...prev, specialite: newSpecialite.trim() }));
+      setNewSpecialite('');
+      setShowAddSpecialite(false);
+      
+      toast({
+        title: "Spécialité ajoutée",
+        description: `La spécialité "${newSpecialite.trim()}" a été ajoutée avec succès.`,
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -227,23 +252,51 @@ const PatientForm = () => {
               </div>
             </div>
 
-            {/* Spécialité */}
+            {/* Spécialité avec option d'ajout */}
             <div>
               <Label htmlFor="specialite" className="text-sm font-medium text-gray-700">
                 Spécialité *
               </Label>
-              <Select onValueChange={(value) => handleInputChange('specialite', value)}>
-                <SelectTrigger className="mt-1 border-blue-200 focus:border-blue-500">
-                  <SelectValue placeholder="Sélectionner une spécialité" />
-                </SelectTrigger>
-                <SelectContent>
-                  {specialites.map((spec) => (
-                    <SelectItem key={spec} value={spec}>
-                      {spec}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2 mt-1">
+                <Select value={formData.specialite} onValueChange={(value) => handleInputChange('specialite', value)}>
+                  <SelectTrigger className="border-blue-200 focus:border-blue-500">
+                    <SelectValue placeholder="Sélectionner une spécialité" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allSpecialites.map((spec) => (
+                      <SelectItem key={spec} value={spec}>
+                        {spec}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddSpecialite(!showAddSpecialite)}
+                  className="px-3"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {showAddSpecialite && (
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    placeholder="Nouvelle spécialité"
+                    value={newSpecialite}
+                    onChange={(e) => setNewSpecialite(e.target.value)}
+                    className="border-green-200 focus:border-green-500"
+                  />
+                  <Button
+                    type="button"
+                    onClick={addNewSpecialite}
+                    className="bg-green-500 hover:bg-green-600"
+                  >
+                    Ajouter
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Médicaments */}
