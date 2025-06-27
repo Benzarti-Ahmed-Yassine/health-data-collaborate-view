@@ -270,7 +270,7 @@ const AdminDashboard = () => {
             {patients.filter(p => p.imc > 30).length > 0 && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-800">
-                  <strong>{patients.filter(p => p.imc > 30).length} patient(s)</strong> présentent une obésité (IMC > 30)
+                  <strong>{patients.filter(p => p.imc > 30).length} patient(s)</strong> présentent une obésité (IMC {"> "}30)
                 </p>
               </div>
             )}
