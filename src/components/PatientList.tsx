@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ interface Patient {
   prenom: string;
   nom: string;
   age: number;
-  gynecologie: string;
+  glycemie: string;
   ta: string;
   taille: number;
   poids: number;
@@ -186,9 +185,9 @@ const PatientList = () => {
                                     </div>
                                   </div>
                                   
-                                  {selectedPatient.gynecologie && (
+                                  {selectedPatient.glycemie && (
                                     <div>
-                                      <strong>Gynécologie:</strong> {selectedPatient.gynecologie}
+                                      <strong>Glycémie:</strong> {selectedPatient.glycemie}
                                     </div>
                                   )}
                                   

@@ -13,7 +13,7 @@ interface Patient {
   prenom: string;
   nom: string;
   age: number;
-  gynecologie: string;
+  glycemie: string;
   ta: string;
   taille: number;
   poids: number;
@@ -30,7 +30,7 @@ const PatientForm = () => {
     prenom: '',
     nom: '',
     age: '',
-    gynecologie: '',
+    glycemie: '',
     ta: '',
     taille: '',
     poids: '',
@@ -101,7 +101,7 @@ const PatientForm = () => {
       prenom: formData.prenom,
       nom: formData.nom,
       age: parseInt(formData.age),
-      gynecologie: formData.gynecologie,
+      glycemie: formData.glycemie,
       ta: formData.ta,
       taille: parseFloat(formData.taille),
       poids: parseFloat(formData.poids),
@@ -124,7 +124,7 @@ const PatientForm = () => {
 
     // Reset du formulaire
     setFormData({
-      prenom: '', nom: '', age: '', gynecologie: '', ta: '', taille: '', poids: '',
+      prenom: '', nom: '', age: '', glycemie: '', ta: '', taille: '', poids: '',
       specialite: '', medicaments: '', notes: ''
     });
   };
@@ -187,13 +187,13 @@ const PatientForm = () => {
               </div>
               
               <div>
-                <Label htmlFor="gynecologie" className="text-sm font-medium text-gray-700">
-                  Gynécologie
+                <Label htmlFor="glycemie" className="text-sm font-medium text-gray-700">
+                  Glycémie
                 </Label>
                 <Input
-                  id="gynecologie"
-                  value={formData.gynecologie}
-                  onChange={(e) => handleInputChange('gynecologie', e.target.value)}
+                  id="glycemie"
+                  value={formData.glycemie}
+                  onChange={(e) => handleInputChange('glycemie', e.target.value)}
                   className="mt-1 border-red-200 focus:border-red-500"
                 />
               </div>

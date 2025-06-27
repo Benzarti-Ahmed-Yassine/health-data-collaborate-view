@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ interface Patient {
   prenom: string;
   nom: string;
   age: number;
-  gynecologie: string;
+  glycemie: string;
   ta: string;
   taille: number;
   poids: number;
@@ -38,7 +37,7 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
     prenom: '',
     nom: '',
     age: '',
-    gynecologie: '',
+    glycemie: '',
     ta: '',
     taille: '',
     poids: '',
@@ -71,7 +70,7 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
         prenom: patient.prenom,
         nom: patient.nom,
         age: patient.age.toString(),
-        gynecologie: patient.gynecologie,
+        glycemie: patient.glycemie,
         ta: patient.ta,
         taille: patient.taille.toString(),
         poids: patient.poids.toString(),
@@ -128,7 +127,7 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
       prenom: formData.prenom,
       nom: formData.nom,
       age: parseInt(formData.age),
-      gynecologie: formData.gynecologie,
+      glycemie: formData.glycemie,
       ta: formData.ta,
       taille: parseFloat(formData.taille),
       poids: parseFloat(formData.poids),
@@ -209,13 +208,13 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
             </div>
             
             <div>
-              <Label htmlFor="gynecologie" className="text-sm font-medium text-gray-700">
-                Gynécologie
+              <Label htmlFor="glycemie" className="text-sm font-medium text-gray-700">
+                Glycémie
               </Label>
               <Input
-                id="gynecologie"
-                value={formData.gynecologie}
-                onChange={(e) => handleInputChange('gynecologie', e.target.value)}
+                id="glycemie"
+                value={formData.glycemie}
+                onChange={(e) => handleInputChange('glycemie', e.target.value)}
                 className="mt-1 border-red-200 focus:border-red-500"
               />
             </div>
