@@ -5,34 +5,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { Save, Plus } from 'lucide-react';
-
-interface Patient {
-  id: string;
-  prenom: string;
-  nom: string;
-  age: number;
-  glycemie: string;
-  ta: string;
-  taille: number;
-  poids: number;
-  imc: number;
-  specialite: string;
-  medicaments: string;
-  notes: string;
-  dateCreation: string;
-}
+import { Save, Plus, Loader2 } from 'lucide-react';
+import { usePatients } from '@/hooks/usePatients';
+import { useSpecialites } from '@/hooks/useSpecialites';
+import type { Patient } from '@/lib/supabase';
 
 interface EditPatientDialogProps {
   patient: Patient | null;
   isOpen: boolean;
   onClose: () => void;
-  onPatientUpdated: () => void;
 }
 
-const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditPatientDialogProps) => {
-  const { toast } = useToast();
+const EditPatientDialog = ({ patient, isOpen, onClose }: EditPatientDialogProps) => {
+  const { updatePatient } = usePatients();
+  const { specialites, addSpecialite } = useSpecialites();
+  
   const [formData, setFormData] = useState({
     prenom: '',
     nom: '',
@@ -45,24 +32,11 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
     medicaments: '',
     notes: ''
   });
-  const [customSpecialites, setCustomSpecialites] = useState<string[]>([]);
+  
   const [newSpecialite, setNewSpecialite] = useState('');
   const [showAddSpecialite, setShowAddSpecialite] = useState(false);
-
-  const defaultSpecialites = [
-    'Généraliste', 'Pédodontiste', 'Orthophoniste',
-    'Pédiatre', 'Cancérologue', 'Nutritionniste',
-    'Gériatre', 'Gastro-entérologue', 'Ergothérapeute',
-    'Endocrinologue', 'Pneumologue', 'Sage-femme',
-    'Ophtalmologue', 'Gynécologue', 'Puéricultrice',
-    'Cardiologue', 'Urologue',
-    'Dentiste', 'Diabétologue'
-  ];
-
-  useEffect(() => {
-    const savedSpecialites = JSON.parse(localStorage.getItem('customSpecialites') || '[]');
-    setCustomSpecialites(savedSpecialites);
-  }, []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingSpecialite, setIsAddingSpecialite] = useState(false);
 
   useEffect(() => {
     if (patient) {
@@ -81,8 +55,6 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
     }
   }, [patient]);
 
-  const allSpecialites = [...defaultSpecialites, ...customSpecialites];
-
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -100,56 +72,51 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
     return '';
   };
 
-  const addNewSpecialite = () => {
-    if (newSpecialite.trim() && !allSpecialites.includes(newSpecialite.trim())) {
-      const updatedCustomSpecialites = [...customSpecialites, newSpecialite.trim()];
-      setCustomSpecialites(updatedCustomSpecialites);
-      localStorage.setItem('customSpecialites', JSON.stringify(updatedCustomSpecialites));
+  const handleAddSpecialite = async () => {
+    if (!newSpecialite.trim()) return;
+    
+    try {
+      setIsAddingSpecialite(true);
+      await addSpecialite(newSpecialite.trim());
       setFormData(prev => ({ ...prev, specialite: newSpecialite.trim() }));
       setNewSpecialite('');
       setShowAddSpecialite(false);
-      
-      toast({
-        title: "Spécialité ajoutée",
-        description: `La spécialité "${newSpecialite.trim()}" a été ajoutée avec succès.`,
-      });
+    } catch (error) {
+      // Error is handled in the hook
+    } finally {
+      setIsAddingSpecialite(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!patient) return;
 
-    const imc = calculateIMC();
-    const updatedPatient: Patient = {
-      ...patient,
-      prenom: formData.prenom,
-      nom: formData.nom,
-      age: parseInt(formData.age),
-      glycemie: formData.glycemie,
-      ta: formData.ta,
-      taille: parseFloat(formData.taille),
-      poids: parseFloat(formData.poids),
-      imc: parseFloat(imc),
-      specialite: formData.specialite,
-      medicaments: formData.medicaments,
-      notes: formData.notes,
-    };
+    try {
+      setIsSubmitting(true);
+      const imc = calculateIMC();
+      
+      await updatePatient(patient.id, {
+        prenom: formData.prenom,
+        nom: formData.nom,
+        age: parseInt(formData.age),
+        glycemie: formData.glycemie,
+        ta: formData.ta,
+        taille: parseFloat(formData.taille) || 0,
+        poids: parseFloat(formData.poids) || 0,
+        imc: parseFloat(imc) || 0,
+        specialite: formData.specialite,
+        medicaments: formData.medicaments,
+        notes: formData.notes,
+      });
 
-    const patients = JSON.parse(localStorage.getItem('patients') || '[]');
-    const updatedPatients = patients.map((p: Patient) => 
-      p.id === patient.id ? updatedPatient : p
-    );
-    localStorage.setItem('patients', JSON.stringify(updatedPatients));
-
-    toast({
-      title: "Patient modifié",
-      description: `${updatedPatient.prenom} ${updatedPatient.nom} a été modifié avec succès.`,
-    });
-
-    onPatientUpdated();
-    onClose();
+      onClose();
+    } catch (error) {
+      // Error is handled in the hook
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -284,9 +251,9 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
                   <SelectValue placeholder="Sélectionner une spécialité" />
                 </SelectTrigger>
                 <SelectContent>
-                  {allSpecialites.map((spec) => (
-                    <SelectItem key={spec} value={spec}>
-                      {spec}
+                  {specialites.map((spec) => (
+                    <SelectItem key={spec.id} value={spec.nom}>
+                      {spec.nom}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -311,10 +278,15 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
                 />
                 <Button
                   type="button"
-                  onClick={addNewSpecialite}
+                  onClick={handleAddSpecialite}
+                  disabled={isAddingSpecialite}
                   className="bg-green-500 hover:bg-green-600"
                 >
-                  Ajouter
+                  {isAddingSpecialite ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Ajouter'
+                  )}
                 </Button>
               </div>
             )}
@@ -353,10 +325,20 @@ const EditPatientDialog = ({ patient, isOpen, onClose, onPatientUpdated }: EditP
           <div className="flex gap-3">
             <Button
               type="submit"
+              disabled={isSubmitting}
               className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Sauvegarder les Modifications
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Sauvegarde...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Sauvegarder les Modifications
+                </>
+              )}
             </Button>
             <Button
               type="button"

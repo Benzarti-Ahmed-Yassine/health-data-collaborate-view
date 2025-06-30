@@ -1,64 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { Users, Search, Edit, Trash2, Eye } from 'lucide-react';
+import { Users, Search, Edit, Trash2, Eye, Loader2 } from 'lucide-react';
+import { usePatients } from '@/hooks/usePatients';
 import EditPatientDialog from './EditPatientDialog';
-
-interface Patient {
-  id: string;
-  prenom: string;
-  nom: string;
-  age: number;
-  glycemie: string;
-  ta: string;
-  taille: number;
-  poids: number;
-  imc: number;
-  specialite: string;
-  medicaments: string;
-  notes: string;
-  dateCreation: string;
-}
+import type { Patient } from '@/lib/supabase';
 
 const PatientList = () => {
-  const { toast } = useToast();
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const { patients, loading, deletePatient } = usePatients();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
-  useEffect(() => {
-    loadPatients();
-  }, []);
-
-  const loadPatients = () => {
-    const savedPatients = JSON.parse(localStorage.getItem('patients') || '[]');
-    setPatients(savedPatients);
-  };
-
-  const deletePatient = (id: string) => {
-    const updatedPatients = patients.filter(p => p.id !== id);
-    setPatients(updatedPatients);
-    localStorage.setItem('patients', JSON.stringify(updatedPatients));
-    
-    toast({
-      title: "Patient supprimé",
-      description: "Le patient a été supprimé avec succès.",
-    });
-  };
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleEditPatient = (patient: Patient) => {
     setEditingPatient(patient);
     setIsEditDialogOpen(true);
   };
 
-  const handlePatientUpdated = () => {
-    loadPatients();
+  const handleDeletePatient = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await deletePatient(id);
+    } catch (error) {
+      // Error is handled in the hook
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const filteredPatients = patients.filter(patient =>
@@ -73,6 +45,19 @@ const PatientList = () => {
     if (imc < 30) return { status: 'Surpoids', color: 'bg-yellow-100 text-yellow-800' };
     return { status: 'Obésité', color: 'bg-red-100 text-red-800' };
   };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-2 text-gray-600">Chargement des patients...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -118,7 +103,7 @@ const PatientList = () => {
                             {patient.prenom} {patient.nom}
                           </h3>
                           <p className="text-sm text-gray-600">
-                            {patient.age} ans • {patient.dateCreation}
+                            {patient.age} ans • {formatDate(patient.created_at)}
                           </p>
                         </div>
                         
@@ -208,6 +193,13 @@ const PatientList = () => {
                                       </p>
                                     </div>
                                   )}
+                                  
+                                  <div className="text-xs text-gray-500 pt-2 border-t">
+                                    Créé le: {formatDate(selectedPatient.created_at)}
+                                    {selectedPatient.updated_at !== selectedPatient.created_at && (
+                                      <span> • Modifié le: {formatDate(selectedPatient.updated_at)}</span>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </DialogContent>
@@ -225,10 +217,15 @@ const PatientList = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => deletePatient(patient.id)}
+                            onClick={() => handleDeletePatient(patient.id)}
+                            disabled={deletingId === patient.id}
                             className="text-red-600 hover:bg-red-50"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            {deletingId === patient.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </div>
@@ -248,7 +245,6 @@ const PatientList = () => {
           setIsEditDialogOpen(false);
           setEditingPatient(null);
         }}
-        onPatientUpdated={handlePatientUpdated}
       />
     </div>
   );

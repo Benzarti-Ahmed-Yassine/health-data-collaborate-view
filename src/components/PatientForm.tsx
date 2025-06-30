@@ -1,31 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Save, Plus } from 'lucide-react';
-
-interface Patient {
-  id: string;
-  prenom: string;
-  nom: string;
-  age: number;
-  glycemie: string;
-  ta: string;
-  taille: number;
-  poids: number;
-  imc: number;
-  specialite: string;
-  medicaments: string;
-  notes: string;
-  dateCreation: string;
-}
+import { UserPlus, Save, Plus, Loader2 } from 'lucide-react';
+import { usePatients } from '@/hooks/usePatients';
+import { useSpecialites } from '@/hooks/useSpecialites';
 
 const PatientForm = () => {
-  const { toast } = useToast();
+  const { addPatient } = usePatients();
+  const { specialites, addSpecialite } = useSpecialites();
+  
   const [formData, setFormData] = useState({
     prenom: '',
     nom: '',
@@ -38,26 +25,11 @@ const PatientForm = () => {
     medicaments: '',
     notes: ''
   });
-  const [customSpecialites, setCustomSpecialites] = useState<string[]>([]);
+  
   const [newSpecialite, setNewSpecialite] = useState('');
   const [showAddSpecialite, setShowAddSpecialite] = useState(false);
-
-  const defaultSpecialites = [
-    'Généraliste', 'Pédodontiste', 'Orthophoniste',
-    'Pédiatre', 'Cancérologue', 'Nutritionniste',
-    'Gériatre', 'Gastro-entérologue', 'Ergothérapeute',
-    'Endocrinologue', 'Pneumologue', 'Sage-femme',
-    'Ophtalmologue', 'Gynécologue', 'Puéricultrice',
-    'Cardiologue', 'Urologue',
-    'Dentiste', 'Diabétologue'
-  ];
-
-  useEffect(() => {
-    const savedSpecialites = JSON.parse(localStorage.getItem('customSpecialites') || '[]');
-    setCustomSpecialites(savedSpecialites);
-  }, []);
-
-  const allSpecialites = [...defaultSpecialites, ...customSpecialites];
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingSpecialite, setIsAddingSpecialite] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -68,7 +40,7 @@ const PatientForm = () => {
 
   const calculateIMC = () => {
     const poids = parseFloat(formData.poids);
-    const taille = parseFloat(formData.taille) / 100; // conversion en mètres
+    const taille = parseFloat(formData.taille) / 100;
     
     if (poids && taille) {
       return (poids / (taille * taille)).toFixed(2);
@@ -76,57 +48,53 @@ const PatientForm = () => {
     return '';
   };
 
-  const addNewSpecialite = () => {
-    if (newSpecialite.trim() && !allSpecialites.includes(newSpecialite.trim())) {
-      const updatedCustomSpecialites = [...customSpecialites, newSpecialite.trim()];
-      setCustomSpecialites(updatedCustomSpecialites);
-      localStorage.setItem('customSpecialites', JSON.stringify(updatedCustomSpecialites));
+  const handleAddSpecialite = async () => {
+    if (!newSpecialite.trim()) return;
+    
+    try {
+      setIsAddingSpecialite(true);
+      await addSpecialite(newSpecialite.trim());
       setFormData(prev => ({ ...prev, specialite: newSpecialite.trim() }));
       setNewSpecialite('');
       setShowAddSpecialite(false);
-      
-      toast({
-        title: "Spécialité ajoutée",
-        description: `La spécialité "${newSpecialite.trim()}" a été ajoutée avec succès.`,
-      });
+    } catch (error) {
+      // Error is handled in the hook
+    } finally {
+      setIsAddingSpecialite(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const imc = calculateIMC();
-    const patient: Patient = {
-      id: Date.now().toString(),
-      prenom: formData.prenom,
-      nom: formData.nom,
-      age: parseInt(formData.age),
-      glycemie: formData.glycemie,
-      ta: formData.ta,
-      taille: parseFloat(formData.taille),
-      poids: parseFloat(formData.poids),
-      imc: parseFloat(imc),
-      specialite: formData.specialite,
-      medicaments: formData.medicaments,
-      notes: formData.notes,
-      dateCreation: new Date().toLocaleDateString('fr-FR')
-    };
+    try {
+      setIsSubmitting(true);
+      const imc = calculateIMC();
+      
+      await addPatient({
+        prenom: formData.prenom,
+        nom: formData.nom,
+        age: parseInt(formData.age),
+        glycemie: formData.glycemie,
+        ta: formData.ta,
+        taille: parseFloat(formData.taille) || 0,
+        poids: parseFloat(formData.poids) || 0,
+        imc: parseFloat(imc) || 0,
+        specialite: formData.specialite,
+        medicaments: formData.medicaments,
+        notes: formData.notes,
+      });
 
-    // Sauvegarde dans localStorage
-    const patients = JSON.parse(localStorage.getItem('patients') || '[]');
-    patients.push(patient);
-    localStorage.setItem('patients', JSON.stringify(patients));
-
-    toast({
-      title: "Patient enregistré",
-      description: `${patient.prenom} ${patient.nom} a été ajouté avec succès.`,
-    });
-
-    // Reset du formulaire
-    setFormData({
-      prenom: '', nom: '', age: '', glycemie: '', ta: '', taille: '', poids: '',
-      specialite: '', medicaments: '', notes: ''
-    });
+      // Reset form
+      setFormData({
+        prenom: '', nom: '', age: '', glycemie: '', ta: '', taille: '', poids: '',
+        specialite: '', medicaments: '', notes: ''
+      });
+    } catch (error) {
+      // Error is handled in the hook
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -263,9 +231,9 @@ const PatientForm = () => {
                     <SelectValue placeholder="Sélectionner une spécialité" />
                   </SelectTrigger>
                   <SelectContent>
-                    {allSpecialites.map((spec) => (
-                      <SelectItem key={spec} value={spec}>
-                        {spec}
+                    {specialites.map((spec) => (
+                      <SelectItem key={spec.id} value={spec.nom}>
+                        {spec.nom}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -290,10 +258,15 @@ const PatientForm = () => {
                   />
                   <Button
                     type="button"
-                    onClick={addNewSpecialite}
+                    onClick={handleAddSpecialite}
+                    disabled={isAddingSpecialite}
                     className="bg-green-500 hover:bg-green-600"
                   >
-                    Ajouter
+                    {isAddingSpecialite ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      'Ajouter'
+                    )}
                   </Button>
                 </div>
               )}
@@ -331,10 +304,20 @@ const PatientForm = () => {
 
             <Button
               type="submit"
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Enregistrer le Patient
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Enregistrement...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Enregistrer le Patient
+                </>
+              )}
             </Button>
           </form>
         </CardContent>

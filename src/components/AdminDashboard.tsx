@@ -1,33 +1,23 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Users, Activity, TrendingUp, Pill, Calendar, AlertCircle } from 'lucide-react';
-
-interface Patient {
-  id: string;
-  prenom: string;
-  nom: string;
-  age: number;
-  gynecologie: string;
-  ta: string;
-  taille: number;
-  poids: number;
-  imc: number;
-  specialite: string;
-  medicaments: string;
-  notes: string;
-  dateCreation: string;
-}
+import { Users, Activity, TrendingUp, Pill, Calendar, AlertCircle, Loader2 } from 'lucide-react';
+import { usePatients } from '@/hooks/usePatients';
+import { useSpecialites } from '@/hooks/useSpecialites';
 
 const AdminDashboard = () => {
-  const [patients, setPatients] = useState<Patient[]>([]);
+  const { patients, loading: patientsLoading } = usePatients();
+  const { specialites, loading: specialitesLoading } = useSpecialites();
 
-  useEffect(() => {
-    const savedPatients = JSON.parse(localStorage.getItem('patients') || '[]');
-    setPatients(savedPatients);
-  }, []);
+  if (patientsLoading || specialitesLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-2 text-gray-600">Chargement du tableau de bord...</span>
+      </div>
+    );
+  }
 
   // Statistiques générales
   const totalPatients = patients.length;
@@ -149,8 +139,8 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Spécialités</p>
-                <p className="text-3xl font-bold text-purple-600">{Object.keys(specialityStats).length}</p>
-                <p className="text-xs text-gray-500">différentes</p>
+                <p className="text-3xl font-bold text-purple-600">{specialites.length}</p>
+                <p className="text-xs text-gray-500">disponibles</p>
               </div>
               <Pill className="h-8 w-8 text-purple-500" />
             </div>
@@ -290,6 +280,12 @@ const AdminDashboard = () => {
                 </p>
               </div>
             )}
+
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>Base de données synchronisée:</strong> Toutes les modifications sont sauvegardées en temps réel et partagées avec tous les utilisateurs.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
