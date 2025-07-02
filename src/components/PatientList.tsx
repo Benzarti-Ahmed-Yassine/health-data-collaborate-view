@@ -36,7 +36,10 @@ const PatientList = () => {
   const filteredPatients = patients.filter(patient =>
     patient.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.specialite.toLowerCase().includes(searchTerm.toLowerCase())
+    patient.specialite.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (patient.specialites && patient.specialites.some(s => 
+      s.nom.toLowerCase().includes(searchTerm.toLowerCase())
+    ))
   );
 
   const getIMCStatus = (imc: number) => {
@@ -108,11 +111,27 @@ const PatientList = () => {
                         </div>
                         
                         <div>
-                          <Badge variant={patient.specialite ? 'default' : 'secondary'} className="mb-1">
-                            {patient.specialite || 'Non spécifié'}
-                          </Badge>
+                          <div className="space-y-1">
+                            <Badge variant={patient.specialite ? 'default' : 'secondary'} className="mb-1">
+                              {patient.specialite || 'Non spécifié'}
+                            </Badge>
+                            {patient.specialites && patient.specialites.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {patient.specialites.slice(0, 2).map((spec) => (
+                                  <Badge key={spec.id} variant="outline" className="text-xs">
+                                    {spec.nom}
+                                  </Badge>
+                                ))}
+                                {patient.specialites.length > 2 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{patient.specialites.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
                           {patient.ta && (
-                            <p className="text-sm text-gray-600">TA: {patient.ta}</p>
+                            <p className="text-sm text-gray-600 mt-1">TA: {patient.ta}</p>
                           )}
                         </div>
                         
@@ -154,7 +173,7 @@ const PatientList = () => {
                                       <strong>Âge:</strong> {selectedPatient.age} ans
                                     </div>
                                     <div>
-                                      <strong>Spécialité:</strong> {selectedPatient.specialite}
+                                      <strong>Spécialité principale:</strong> {selectedPatient.specialite}
                                     </div>
                                     <div>
                                       <strong>Poids:</strong> {selectedPatient.poids} kg
@@ -169,6 +188,19 @@ const PatientList = () => {
                                       <strong>TA:</strong> {selectedPatient.ta || 'Non renseignée'}
                                     </div>
                                   </div>
+
+                                  {selectedPatient.specialites && selectedPatient.specialites.length > 0 && (
+                                    <div>
+                                      <strong>Toutes les spécialités:</strong>
+                                      <div className="flex flex-wrap gap-2 mt-2">
+                                        {selectedPatient.specialites.map((spec) => (
+                                          <Badge key={spec.id} variant="outline">
+                                            {spec.nom}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
                                   
                                   {selectedPatient.glycemie && (
                                     <div>

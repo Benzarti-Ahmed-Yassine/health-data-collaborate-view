@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase, type Patient } from '@/lib/supabase'
+import { supabase, type Patient, type Specialite } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 
 export const usePatients = () => {
@@ -12,11 +12,28 @@ export const usePatients = () => {
       setLoading(true)
       const { data, error } = await supabase
         .from('patients')
-        .select('*')
+        .select(`
+          *,
+          patient_specialites (
+            id,
+            specialite_id,
+            specialites (
+              id,
+              nom
+            )
+          )
+        `)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setPatients(data || [])
+      
+      // Transformer les données pour inclure les spécialités
+      const patientsWithSpecialites = data?.map(patient => ({
+        ...patient,
+        specialites: patient.patient_specialites?.map(ps => ps.specialites).filter(Boolean) || []
+      })) || []
+      
+      setPatients(patientsWithSpecialites)
     } catch (error) {
       console.error('Error fetching patients:', error)
       toast({
@@ -39,7 +56,7 @@ export const usePatients = () => {
 
       if (error) throw error
       
-      setPatients(prev => [data, ...prev])
+      await fetchPatients() // Recharger pour avoir les spécialités
       toast({
         title: "Patient ajouté",
         description: `${data.prenom} ${data.nom} a été ajouté avec succès.`
@@ -67,7 +84,7 @@ export const usePatients = () => {
 
       if (error) throw error
 
-      setPatients(prev => prev.map(p => p.id === id ? data : p))
+      await fetchPatients() // Recharger pour avoir les spécialités
       toast({
         title: "Patient modifié",
         description: `${data.prenom} ${data.nom} a été modifié avec succès.`
@@ -109,6 +126,56 @@ export const usePatients = () => {
     }
   }
 
+  const addSpecialiteToPatient = async (patientId: string, specialiteId: string) => {
+    try {
+      const { error } = await supabase
+        .from('patient_specialites')
+        .insert([{ patient_id: patientId, specialite_id: specialiteId }])
+
+      if (error) throw error
+
+      await fetchPatients()
+      toast({
+        title: "Spécialité ajoutée",
+        description: "La spécialité a été ajoutée au patient avec succès."
+      })
+    } catch (error) {
+      console.error('Error adding specialite to patient:', error)
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la spécialité au patient",
+        variant: "destructive"
+      })
+      throw error
+    }
+  }
+
+  const removeSpecialiteFromPatient = async (patientId: string, specialiteId: string) => {
+    try {
+      const { error } = await supabase
+        .from('patient_specialites')
+        .delete()
+        .eq('patient_id', patientId)
+        .eq('specialite_id', specialiteId)
+
+      if (error) throw error
+
+      await fetchPatients()
+      toast({
+        title: "Spécialité supprimée",
+        description: "La spécialité a été supprimée du patient avec succès."
+      })
+    } catch (error) {
+      console.error('Error removing specialite from patient:', error)
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la spécialité du patient",
+        variant: "destructive"
+      })
+      throw error
+    }
+  }
+
   useEffect(() => {
     fetchPatients()
 
@@ -117,17 +184,11 @@ export const usePatients = () => {
       .channel('patients_changes')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'patients' },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            setPatients(prev => [payload.new as Patient, ...prev])
-          } else if (payload.eventType === 'UPDATE') {
-            setPatients(prev => prev.map(p => 
-              p.id === payload.new.id ? payload.new as Patient : p
-            ))
-          } else if (payload.eventType === 'DELETE') {
-            setPatients(prev => prev.filter(p => p.id !== payload.old.id))
-          }
-        }
+        () => fetchPatients()
+      )
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'patient_specialites' },
+        () => fetchPatients()
       )
       .subscribe()
 
@@ -142,6 +203,8 @@ export const usePatients = () => {
     addPatient,
     updatePatient,
     deletePatient,
+    addSpecialiteToPatient,
+    removeSpecialiteFromPatient,
     refetch: fetchPatients
   }
 }

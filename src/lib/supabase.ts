@@ -25,10 +25,19 @@ export interface Patient {
   notes: string
   created_at: string
   updated_at: string
+  specialites?: Specialite[] // Nouvelles spécialités multiples
 }
 
 export interface Specialite {
   id: string
   nom: string
   created_at: string
+}
+
+export interface PatientSpecialite {
+  id: string
+  patient_id: string
+  specialite_id: string
+  created_at: string
+  specialite?: Specialite
 }

@@ -64,6 +64,31 @@ export const useSpecialites = () => {
     }
   }
 
+  const deleteSpecialite = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('specialites')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      setSpecialites(prev => prev.filter(s => s.id !== id))
+      toast({
+        title: "Spécialité supprimée",
+        description: "La spécialité a été supprimée avec succès."
+      })
+    } catch (error) {
+      console.error('Error deleting specialite:', error)
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la spécialité",
+        variant: "destructive"
+      })
+      throw error
+    }
+  }
+
   useEffect(() => {
     fetchSpecialites()
 
@@ -75,6 +100,8 @@ export const useSpecialites = () => {
         (payload) => {
           if (payload.eventType === 'INSERT') {
             setSpecialites(prev => [...prev, payload.new as Specialite].sort((a, b) => a.nom.localeCompare(b.nom)))
+          } else if (payload.eventType === 'DELETE') {
+            setSpecialites(prev => prev.filter(s => s.id !== payload.old.id))
           }
         }
       )
@@ -89,6 +116,7 @@ export const useSpecialites = () => {
     specialites,
     loading,
     addSpecialite,
+    deleteSpecialite,
     refetch: fetchSpecialites
   }
 }
