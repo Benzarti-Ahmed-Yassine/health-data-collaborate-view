@@ -6,13 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, Save, Plus, Loader2 } from 'lucide-react';
+import { UserPlus, Save, Plus, Loader2, Trash2 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useSpecialites } from '@/hooks/useSpecialites';
 
 const PatientForm = () => {
   const { addPatient, addSpecialiteToPatient } = usePatients();
-  const { specialites, addSpecialite } = useSpecialites();
+  const { specialites, addSpecialite, deleteSpecialite } = useSpecialites();
   
   const [formData, setFormData] = useState({
     prenom: '',
@@ -28,10 +28,12 @@ const PatientForm = () => {
   });
   
   const [selectedSpecialiteIds, setSelectedSpecialiteIds] = useState<string[]>([]);
+  const [selectedForDeletion, setSelectedForDeletion] = useState<string[]>([]);
   const [newSpecialite, setNewSpecialite] = useState('');
   const [showAddSpecialite, setShowAddSpecialite] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddingSpecialite, setIsAddingSpecialite] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -45,6 +47,14 @@ const PatientForm = () => {
       setSelectedSpecialiteIds(prev => [...prev, specialiteId]);
     } else {
       setSelectedSpecialiteIds(prev => prev.filter(id => id !== specialiteId));
+    }
+  };
+
+  const handleDeletionSelection = (specialiteId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedForDeletion(prev => [...prev, specialiteId]);
+    } else {
+      setSelectedForDeletion(prev => prev.filter(id => id !== specialiteId));
     }
   };
 
@@ -75,12 +85,38 @@ const PatientForm = () => {
     }
   };
 
+  const handleDeleteSpecialites = async () => {
+    if (selectedForDeletion.length === 0) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      for (const specialiteId of selectedForDeletion) {
+        await deleteSpecialite(specialiteId);
+      }
+      
+      setSelectedForDeletion([]);
+    } catch (error) {
+      // Error handled in hook
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const selectAllSpecialites = () => {
     setSelectedSpecialiteIds(specialites.map(spec => spec.id));
   };
 
   const clearSpecialiteSelection = () => {
     setSelectedSpecialiteIds([]);
+  };
+
+  const selectAllForDeletion = () => {
+    setSelectedForDeletion(specialites.map(spec => spec.id));
+  };
+
+  const clearDeletionSelection = () => {
+    setSelectedForDeletion([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,7 +163,12 @@ const PatientForm = () => {
     <div className="space-y-6">
       <Card className="border-blue-200 shadow-lg">
         <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-3">
+            <img 
+              src="/1.png" 
+              alt="Logo Médical" 
+              className="h-8 w-8 object-contain bg-white rounded-full p-1"
+            />
             <UserPlus className="h-6 w-6" />
             <span>Fiche du Patient</span>
           </CardTitle>
@@ -395,6 +436,85 @@ const PatientForm = () => {
               )}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Section de suppression des spécialités */}
+      <Card className="border-red-200 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-red-500 to-red-600 text-white">
+          <CardTitle className="flex items-center space-x-2">
+            <Trash2 className="h-5 w-5" />
+            <span>Gestion des Spécialités</span>
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <Label className="text-sm font-medium text-gray-700">
+              Supprimer des spécialités ({selectedForDeletion.length} sélectionnées)
+            </Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={selectAllForDeletion}
+                disabled={selectedForDeletion.length === specialites.length}
+              >
+                Tout sélectionner
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={clearDeletionSelection}
+                disabled={selectedForDeletion.length === 0}
+              >
+                Tout désélectionner
+              </Button>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4 border rounded-lg bg-red-50 mb-4">
+            {specialites.map((specialite) => (
+              <div key={specialite.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`delete-spec-${specialite.id}`}
+                  checked={selectedForDeletion.includes(specialite.id)}
+                  onCheckedChange={(checked) => 
+                    handleDeletionSelection(specialite.id, checked as boolean)
+                  }
+                />
+                <label 
+                  htmlFor={`delete-spec-${specialite.id}`}
+                  className="text-sm font-medium cursor-pointer"
+                >
+                  {specialite.nom}
+                </label>
+              </div>
+            ))}
+          </div>
+
+          {selectedForDeletion.length > 0 && (
+            <Button
+              onClick={handleDeleteSpecialites}
+              disabled={isDeleting}
+              variant="destructive"
+              className="w-full"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Suppression en cours...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer définitivement {selectedForDeletion.length} spécialité(s)
+                </>
+              )}
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>
