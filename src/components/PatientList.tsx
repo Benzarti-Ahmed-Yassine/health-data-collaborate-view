@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users, Search, Edit, Trash2, Eye, Loader2 } from 'lucide-react';
+import { Users, Search, Edit, Trash2, Eye, Loader2, Download, FileText } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import EditPatientDialog from './EditPatientDialog';
 import type { Patient } from '@/lib/supabase';
@@ -16,6 +16,7 @@ const PatientList = () => {
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleEditPatient = (patient: Patient) => {
     setEditingPatient(patient);
@@ -30,6 +31,127 @@ const PatientList = () => {
       // Error is handled in the hook
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const generatePatientPDF = (patient: Patient) => {
+    const content = `
+FICHE PATIENT - DIAGNOSTIC MÉDICAL
+=====================================
+
+INFORMATIONS PERSONNELLES
+-------------------------
+Nom: ${patient.nom}
+Prénom: ${patient.prenom}
+Âge: ${patient.age} ans
+Date de création: ${new Date(patient.created_at).toLocaleDateString('fr-FR')}
+Dernière modification: ${new Date(patient.updated_at).toLocaleDateString('fr-FR')}
+
+DONNÉES MÉDICALES
+-----------------
+Glycémie: ${patient.glycemie || 'Non renseignée'}
+Tension Artérielle: ${patient.ta || 'Non renseignée'}
+Taille: ${patient.taille > 0 ? `${patient.taille} cm` : 'Non renseignée'}
+Poids: ${patient.poids > 0 ? `${patient.poids} kg` : 'Non renseigné'}
+IMC: ${patient.imc > 0 ? patient.imc : 'Non calculé'}
+
+SPÉCIALITÉS
+-----------
+Spécialité principale: ${patient.specialite || 'Non spécifiée'}
+${patient.specialites && patient.specialites.length > 0 ? 
+  `Spécialités supplémentaires:\n${patient.specialites.map(s => `- ${s.nom}`).join('\n')}` : 
+  'Aucune spécialité supplémentaire'
+}
+
+MÉDICAMENTS PRESCRITS
+--------------------
+${patient.medicaments || 'Aucun médicament prescrit'}
+
+NOTES MÉDICALES
+---------------
+${patient.notes || 'Aucune note médicale'}
+
+=====================================
+Document généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+Système de Gestion Patients - Interface Médicale Professionnelle
+    `;
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `diagnostic_${patient.nom}_${patient.prenom}_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const generateAllPatientsPDF = async () => {
+    try {
+      setIsGeneratingPDF(true);
+      
+      let allContent = `
+RAPPORT COMPLET - TOUS LES PATIENTS
+===================================
+Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+Nombre total de patients: ${patients.length}
+
+`;
+
+      patients.forEach((patient, index) => {
+        allContent += `
+${index + 1}. PATIENT: ${patient.prenom} ${patient.nom}
+${'='.repeat(50)}
+
+INFORMATIONS PERSONNELLES
+-------------------------
+Nom: ${patient.nom}
+Prénom: ${patient.prenom}
+Âge: ${patient.age} ans
+Date de création: ${new Date(patient.created_at).toLocaleDateString('fr-FR')}
+
+DONNÉES MÉDICALES
+-----------------
+Glycémie: ${patient.glycemie || 'Non renseignée'}
+Tension Artérielle: ${patient.ta || 'Non renseignée'}
+Taille: ${patient.taille > 0 ? `${patient.taille} cm` : 'Non renseignée'}
+Poids: ${patient.poids > 0 ? `${patient.poids} kg` : 'Non renseigné'}
+IMC: ${patient.imc > 0 ? patient.imc : 'Non calculé'}
+
+SPÉCIALITÉS
+-----------
+Spécialité principale: ${patient.specialite || 'Non spécifiée'}
+${patient.specialites && patient.specialites.length > 0 ? 
+  `Spécialités supplémentaires:\n${patient.specialites.map(s => `- ${s.nom}`).join('\n')}` : 
+  'Aucune spécialité supplémentaire'
+}
+
+MÉDICAMENTS: ${patient.medicaments || 'Aucun'}
+NOTES: ${patient.notes || 'Aucune note'}
+
+`;
+      });
+
+      allContent += `
+=====================================
+Fin du rapport - ${patients.length} patient(s) traité(s)
+Système de Gestion Patients - Interface Médicale Professionnelle
+`;
+
+      const blob = new Blob([allContent], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rapport_tous_patients_${new Date().toISOString().split('T')[0]}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erreur lors de la génération du PDF:', error);
+    } finally {
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -71,6 +193,24 @@ const PatientList = () => {
               <Users className="h-6 w-6" />
               <span>Liste des Patients ({patients.length})</span>
             </div>
+            <Button
+              onClick={generateAllPatientsPDF}
+              disabled={isGeneratingPDF || patients.length === 0}
+              variant="secondary"
+              className="bg-white text-blue-600 hover:bg-gray-100"
+            >
+              {isGeneratingPDF ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Génération...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Télécharger Tous (PDF)
+                </>
+              )}
+            </Button>
           </CardTitle>
         </CardHeader>
         
@@ -232,6 +372,16 @@ const PatientList = () => {
                                       <span> • Modifié le: {formatDate(selectedPatient.updated_at)}</span>
                                     )}
                                   </div>
+
+                                  <div className="flex gap-2 pt-4 border-t">
+                                    <Button
+                                      onClick={() => generatePatientPDF(selectedPatient)}
+                                      className="flex-1 bg-green-500 hover:bg-green-600"
+                                    >
+                                      <FileText className="h-4 w-4 mr-2" />
+                                      Télécharger Diagnostic (PDF)
+                                    </Button>
+                                  </div>
                                 </div>
                               )}
                             </DialogContent>
@@ -258,6 +408,15 @@ const PatientList = () => {
                             ) : (
                               <Trash2 className="h-4 w-4" />
                             )}
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => generatePatientPDF(patient)}
+                            className="text-green-600 hover:bg-green-50"
+                          >
+                            <Download className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
