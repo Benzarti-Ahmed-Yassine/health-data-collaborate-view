@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { UserPlus, Save, Plus, Loader2 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useSpecialites } from '@/hooks/useSpecialites';
 
 const PatientForm = () => {
-  const { addPatient } = usePatients();
+  const { addPatient, addSpecialiteToPatient } = usePatients();
   const { specialites, addSpecialite } = useSpecialites();
   
   const [formData, setFormData] = useState({
@@ -26,6 +27,7 @@ const PatientForm = () => {
     notes: ''
   });
   
+  const [selectedSpecialiteIds, setSelectedSpecialiteIds] = useState<string[]>([]);
   const [newSpecialite, setNewSpecialite] = useState('');
   const [showAddSpecialite, setShowAddSpecialite] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,6 +38,14 @@ const PatientForm = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleSpecialiteSelection = (specialiteId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedSpecialiteIds(prev => [...prev, specialiteId]);
+    } else {
+      setSelectedSpecialiteIds(prev => prev.filter(id => id !== specialiteId));
+    }
   };
 
   const calculateIMC = () => {
@@ -53,8 +63,9 @@ const PatientForm = () => {
     
     try {
       setIsAddingSpecialite(true);
-      await addSpecialite(newSpecialite.trim());
+      const newSpec = await addSpecialite(newSpecialite.trim());
       setFormData(prev => ({ ...prev, specialite: newSpecialite.trim() }));
+      setSelectedSpecialiteIds(prev => [...prev, newSpec.id]);
       setNewSpecialite('');
       setShowAddSpecialite(false);
     } catch (error) {
@@ -64,6 +75,14 @@ const PatientForm = () => {
     }
   };
 
+  const selectAllSpecialites = () => {
+    setSelectedSpecialiteIds(specialites.map(spec => spec.id));
+  };
+
+  const clearSpecialiteSelection = () => {
+    setSelectedSpecialiteIds([]);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -71,7 +90,8 @@ const PatientForm = () => {
       setIsSubmitting(true);
       const imc = calculateIMC();
       
-      await addPatient({
+      // Créer le patient
+      const newPatient = await addPatient({
         prenom: formData.prenom,
         nom: formData.nom,
         age: parseInt(formData.age),
@@ -85,11 +105,17 @@ const PatientForm = () => {
         notes: formData.notes,
       });
 
+      // Assigner toutes les spécialités sélectionnées
+      for (const specialiteId of selectedSpecialiteIds) {
+        await addSpecialiteToPatient(newPatient.id, specialiteId);
+      }
+
       // Reset form
       setFormData({
         prenom: '', nom: '', age: '', glycemie: '', ta: '', taille: '', poids: '',
         specialite: '', medicaments: '', notes: ''
       });
+      setSelectedSpecialiteIds([]);
     } catch (error) {
       // Error is handled in the hook
     } finally {
@@ -220,10 +246,10 @@ const PatientForm = () => {
               </div>
             </div>
 
-            {/* Spécialité avec option d'ajout */}
+            {/* Spécialité principale avec option d'ajout */}
             <div>
               <Label htmlFor="specialite" className="text-sm font-medium text-gray-700">
-                Spécialité *
+                Spécialité principale *
               </Label>
               <div className="flex gap-2 mt-1">
                 <Select value={formData.specialite} onValueChange={(value) => handleInputChange('specialite', value)}>
@@ -270,6 +296,55 @@ const PatientForm = () => {
                   </Button>
                 </div>
               )}
+            </div>
+
+            {/* Spécialités multiples */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-sm font-medium text-gray-700">
+                  Spécialités supplémentaires ({selectedSpecialiteIds.length} sélectionnées)
+                </Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={selectAllSpecialites}
+                    disabled={selectedSpecialiteIds.length === specialites.length}
+                  >
+                    Tout sélectionner
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={clearSpecialiteSelection}
+                    disabled={selectedSpecialiteIds.length === 0}
+                  >
+                    Tout désélectionner
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4 border rounded-lg bg-gray-50">
+                {specialites.map((specialite) => (
+                  <div key={specialite.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`new-spec-${specialite.id}`}
+                      checked={selectedSpecialiteIds.includes(specialite.id)}
+                      onCheckedChange={(checked) => 
+                        handleSpecialiteSelection(specialite.id, checked as boolean)
+                      }
+                    />
+                    <label 
+                      htmlFor={`new-spec-${specialite.id}`}
+                      className="text-sm font-medium cursor-pointer"
+                    >
+                      {specialite.nom}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Médicaments */}
