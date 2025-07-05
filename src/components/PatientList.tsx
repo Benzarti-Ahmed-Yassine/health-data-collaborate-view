@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Users, Search, Edit, Trash2, Eye, Loader2, Download, FileText } from 'lucide-react';
+import { Users, Search, Edit, Trash2, Eye, Loader2, Download, FileText, Heart } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import EditPatientDialog from './EditPatientDialog';
 import type { Patient } from '@/lib/supabase';
@@ -36,8 +36,8 @@ const PatientList = () => {
 
   const generatePatientPDF = (patient: Patient) => {
     const content = `
-FICHE PATIENT - DIAGNOSTIC MÉDICAL
-=====================================
+FICHE PATIENT - DIAGNOSTIC MÉDICAL PAR'ACT
+==========================================
 
 INFORMATIONS PERSONNELLES
 -------------------------
@@ -71,9 +71,10 @@ NOTES MÉDICALES
 ---------------
 ${patient.notes || 'Aucune note médicale'}
 
-=====================================
+==========================================
 Document généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
-Système de Gestion Patients - Interface Médicale Professionnelle
+PAR'ACT Association - Système de Gestion Patients
+Interface Médicale Professionnelle
     `;
 
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
@@ -92,10 +93,11 @@ Système de Gestion Patients - Interface Médicale Professionnelle
       setIsGeneratingPDF(true);
       
       let allContent = `
-RAPPORT COMPLET - TOUS LES PATIENTS
-===================================
+RAPPORT COMPLET - TOUS LES PATIENTS PAR'ACT
+===========================================
 Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
 Nombre total de patients: ${patients.length}
+PAR'ACT Association - Système de Gestion Patients
 
 `;
 
@@ -134,16 +136,17 @@ NOTES: ${patient.notes || 'Aucune note'}
       });
 
       allContent += `
-=====================================
+==========================================
 Fin du rapport - ${patients.length} patient(s) traité(s)
-Système de Gestion Patients - Interface Médicale Professionnelle
+PAR'ACT Association - Système de Gestion Patients
+Interface Médicale Professionnelle
 `;
 
       const blob = new Blob([allContent], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `rapport_tous_patients_${new Date().toISOString().split('T')[0]}.txt`;
+      link.download = `rapport_tous_patients_PARACT_${new Date().toISOString().split('T')[0]}.txt`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -178,18 +181,24 @@ Système de Gestion Patients - Interface Médicale Professionnelle
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-2 text-gray-600">Chargement des patients...</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="border-blue-200 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+    <div className="space-y-6 animate-fade-in-up">
+      <Card className="border-primary/20 shadow-xl card-hover">
+        <CardHeader className="medical-gradient text-white">
           <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/2.png" 
+                alt="PAR'ACT Logo" 
+                className="h-8 w-8 object-contain bg-white rounded-full p-1"
+              />
+              <Heart className="h-6 w-6 animate-pulse-slow" />
               <Users className="h-6 w-6" />
               <span>Liste des Patients ({patients.length})</span>
             </div>
@@ -197,7 +206,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
               onClick={generateAllPatientsPDF}
               disabled={isGeneratingPDF || patients.length === 0}
               variant="secondary"
-              className="bg-white text-blue-600 hover:bg-gray-100"
+              className="bg-white text-primary hover:bg-gray-100 smooth-transition"
             >
               {isGeneratingPDF ? (
                 <>
@@ -216,28 +225,28 @@ Système de Gestion Patients - Interface Médicale Professionnelle
         
         <CardContent className="p-6">
           {/* Barre de recherche */}
-          <div className="relative mb-6">
+          <div className="relative mb-6 animate-slide-in-left delay-200">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Rechercher par nom, prénom ou spécialité..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-gray-300 focus:border-blue-500"
+              className="pl-10 border-primary/30 focus:border-primary smooth-transition"
             />
           </div>
 
           {/* Liste des patients */}
           <div className="space-y-4">
             {filteredPatients.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 animate-fade-in-up delay-300">
                 {patients.length === 0 ? 
                   "Aucun patient enregistré" : 
                   "Aucun patient trouvé pour cette recherche"
                 }
               </div>
             ) : (
-              filteredPatients.map((patient) => (
-                <Card key={patient.id} className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+              filteredPatients.map((patient, index) => (
+                <Card key={patient.id} className={`border-l-4 border-l-primary hover:shadow-lg smooth-transition card-hover animate-fade-in-up delay-${100 + index * 50}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -252,18 +261,18 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                         
                         <div>
                           <div className="space-y-1">
-                            <Badge variant={patient.specialite ? 'default' : 'secondary'} className="mb-1">
+                            <Badge variant={patient.specialite ? 'default' : 'secondary'} className="mb-1 bg-primary hover:bg-primary/90">
                               {patient.specialite || 'Non spécifié'}
                             </Badge>
                             {patient.specialites && patient.specialites.length > 0 && (
                               <div className="flex flex-wrap gap-1">
                                 {patient.specialites.slice(0, 2).map((spec) => (
-                                  <Badge key={spec.id} variant="outline" className="text-xs">
+                                  <Badge key={spec.id} variant="outline" className="text-xs border-primary/30">
                                     {spec.nom}
                                   </Badge>
                                 ))}
                                 {patient.specialites.length > 2 && (
-                                  <Badge variant="outline" className="text-xs">
+                                  <Badge variant="outline" className="text-xs border-primary/30">
                                     +{patient.specialites.length - 2}
                                   </Badge>
                                 )}
@@ -295,6 +304,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => setSelectedPatient(patient)}
+                                className="smooth-transition hover:bg-red-50 border-primary/30"
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 Voir
@@ -302,8 +312,13 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                               <DialogHeader>
-                                <DialogTitle>
-                                  Fiche Patient - {selectedPatient?.prenom} {selectedPatient?.nom}
+                                <DialogTitle className="flex items-center space-x-2">
+                                  <img 
+                                    src="/2.png" 
+                                    alt="PAR'ACT Logo" 
+                                    className="h-6 w-6 object-contain"
+                                  />
+                                  <span>Fiche Patient - {selectedPatient?.prenom} {selectedPatient?.nom}</span>
                                 </DialogTitle>
                               </DialogHeader>
                               {selectedPatient && (
@@ -334,7 +349,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                                       <strong>Toutes les spécialités:</strong>
                                       <div className="flex flex-wrap gap-2 mt-2">
                                         {selectedPatient.specialites.map((spec) => (
-                                          <Badge key={spec.id} variant="outline">
+                                          <Badge key={spec.id} variant="outline" className="border-primary/30">
                                             {spec.nom}
                                           </Badge>
                                         ))}
@@ -351,7 +366,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                                   {selectedPatient.medicaments && (
                                     <div>
                                       <strong>Médicaments:</strong>
-                                      <p className="mt-1 p-2 bg-gray-50 rounded text-sm">
+                                      <p className="mt-1 p-2 bg-red-50 rounded text-sm">
                                         {selectedPatient.medicaments}
                                       </p>
                                     </div>
@@ -360,7 +375,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                                   {selectedPatient.notes && (
                                     <div>
                                       <strong>Notes médicales:</strong>
-                                      <p className="mt-1 p-2 bg-gray-50 rounded text-sm">
+                                      <p className="mt-1 p-2 bg-red-50 rounded text-sm">
                                         {selectedPatient.notes}
                                       </p>
                                     </div>
@@ -376,7 +391,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                                   <div className="flex gap-2 pt-4 border-t">
                                     <Button
                                       onClick={() => generatePatientPDF(selectedPatient)}
-                                      className="flex-1 bg-green-500 hover:bg-green-600"
+                                      className="flex-1 bg-green-500 hover:bg-green-600 smooth-transition"
                                     >
                                       <FileText className="h-4 w-4 mr-2" />
                                       Télécharger Diagnostic (PDF)
@@ -391,7 +406,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                             variant="outline"
                             size="sm"
                             onClick={() => handleEditPatient(patient)}
-                            className="text-blue-600 hover:bg-blue-50"
+                            className="text-primary hover:bg-red-50 border-primary/30 smooth-transition"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -401,7 +416,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                             size="sm"
                             onClick={() => handleDeletePatient(patient.id)}
                             disabled={deletingId === patient.id}
-                            className="text-red-600 hover:bg-red-50"
+                            className="text-red-600 hover:bg-red-50 border-red-300 smooth-transition"
                           >
                             {deletingId === patient.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -414,7 +429,7 @@ Système de Gestion Patients - Interface Médicale Professionnelle
                             variant="outline"
                             size="sm"
                             onClick={() => generatePatientPDF(patient)}
-                            className="text-green-600 hover:bg-green-50"
+                            className="text-green-600 hover:bg-green-50 border-green-300 smooth-transition"
                           >
                             <Download className="h-4 w-4" />
                           </Button>

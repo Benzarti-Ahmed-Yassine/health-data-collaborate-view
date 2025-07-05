@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-import { Users, Activity, TrendingUp, Pill, Calendar, AlertCircle, Loader2 } from 'lucide-react';
+import { Users, Activity, TrendingUp, Pill, Calendar, AlertCircle, Loader2, Heart } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useSpecialites } from '@/hooks/useSpecialites';
 
@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   if (patientsLoading || specialitesLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-2 text-gray-600">Chargement du tableau de bord...</span>
       </div>
     );
@@ -90,25 +90,40 @@ const AdminDashboard = () => {
     .slice(0, 10)
     .map(([name, count]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), count }));
 
-  const COLORS = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
+  const COLORS = ['#DC2626', '#EF4444', '#F87171', '#FCA5A5', '#FECACA', '#FEE2E2', '#DC2626', '#B91C1C'];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
+      {/* En-tête avec logo PAR'ACT */}
+      <Card className="border-primary/20 shadow-xl card-hover">
+        <CardHeader className="medical-gradient text-white">
+          <CardTitle className="flex items-center space-x-3">
+            <img 
+              src="/2.png" 
+              alt="PAR'ACT Logo" 
+              className="h-10 w-10 object-contain bg-white rounded-full p-1 animate-pulse-slow"
+            />
+            <Heart className="h-6 w-6 animate-heartbeat" />
+            <span>Tableau de Bord PAR'ACT</span>
+          </CardTitle>
+        </CardHeader>
+      </Card>
+
       {/* Statistiques générales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="border-blue-200 shadow-lg">
+        <Card className="border-primary/20 shadow-lg card-hover animate-slide-in-left delay-100">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Patients</p>
-                <p className="text-3xl font-bold text-blue-600">{totalPatients}</p>
+                <p className="text-3xl font-bold text-primary">{totalPatients}</p>
               </div>
-              <Users className="h-8 w-8 text-blue-500" />
+              <Users className="h-8 w-8 text-primary animate-pulse-slow" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-green-200 shadow-lg">
+        <Card className="border-green-200 shadow-lg card-hover animate-slide-in-left delay-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -121,7 +136,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-orange-200 shadow-lg">
+        <Card className="border-orange-200 shadow-lg card-hover animate-slide-in-left delay-300">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -134,7 +149,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="border-purple-200 shadow-lg">
+        <Card className="border-purple-200 shadow-lg card-hover animate-slide-in-left delay-400">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -151,10 +166,10 @@ const AdminDashboard = () => {
       {/* Graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Répartition par spécialité */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg card-hover animate-fade-in-up delay-500">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <TrendingUp className="h-5 w-5 text-primary" />
               <span>Répartition par Spécialité</span>
             </CardTitle>
           </CardHeader>
@@ -182,7 +197,7 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Répartition par âge */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg card-hover animate-fade-in-up delay-600">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-green-600" />
@@ -203,7 +218,7 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Analyse IMC */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg card-hover animate-fade-in-up delay-700">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Activity className="h-5 w-5 text-orange-600" />
@@ -224,7 +239,7 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Top médicaments */}
-        <Card className="shadow-lg">
+        <Card className="shadow-lg card-hover animate-fade-in-up delay-800">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Pill className="h-5 w-5 text-purple-600" />
@@ -234,12 +249,12 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="space-y-3">
               {topMedicaments.slice(0, 8).map((med, index) => (
-                <div key={med.name} className="flex items-center justify-between">
+                <div key={med.name} className={`flex items-center justify-between animate-fade-in-up delay-${100 + index * 50}`}>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
                     <span className="text-sm font-medium">{med.name}</span>
                   </div>
-                  <Badge variant="secondary">{med.count} patients</Badge>
+                  <Badge variant="secondary" className="bg-red-50 text-primary border-primary/30">{med.count} patients</Badge>
                 </div>
               ))}
             </div>
@@ -248,17 +263,17 @@ const AdminDashboard = () => {
       </div>
 
       {/* Alertes et recommandations */}
-      <Card className="border-yellow-200 shadow-lg">
+      <Card className="border-yellow-200 shadow-lg card-hover animate-fade-in-up delay-900">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-yellow-700">
             <AlertCircle className="h-5 w-5" />
-            <span>Alertes et Recommandations</span>
+            <span>Alertes et Recommandations PAR'ACT</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {patients.filter(p => p.imc > 30).length > 0 && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg animate-slide-in-left delay-100">
                 <p className="text-sm text-red-800">
                   <strong>{patients.filter(p => p.imc > 30).length} patient(s)</strong> présentent une obésité (IMC {"> "}30)
                 </p>
@@ -266,7 +281,7 @@ const AdminDashboard = () => {
             )}
             
             {patients.filter(p => p.age > 65).length > 0 && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg animate-slide-in-left delay-200">
                 <p className="text-sm text-blue-800">
                   <strong>{patients.filter(p => p.age > 65).length} patient(s)</strong> sont âgés de plus de 65 ans
                 </p>
@@ -274,16 +289,16 @@ const AdminDashboard = () => {
             )}
             
             {patients.filter(p => !p.specialite).length > 0 && (
-              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg animate-slide-in-left delay-300">
                 <p className="text-sm text-yellow-800">
                   <strong>{patients.filter(p => !p.specialite).length} patient(s)</strong> n'ont pas de spécialité assignée
                 </p>
               </div>
             )}
 
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg animate-slide-in-left delay-400">
               <p className="text-sm text-green-800">
-                <strong>Base de données synchronisée:</strong> Toutes les modifications sont sauvegardées en temps réel et partagées avec tous les utilisateurs.
+                <strong>Base de données synchronisée:</strong> Toutes les modifications sont sauvegardées en temps réel et partagées avec tous les utilisateurs via PAR'ACT Association.
               </p>
             </div>
           </div>
