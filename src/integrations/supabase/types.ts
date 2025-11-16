@@ -14,7 +14,182 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      famille_medicaments: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          nom: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          nom: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          nom?: string
+        }
+        Relationships: []
+      }
+      medicaments: {
+        Row: {
+          created_at: string
+          description: string | null
+          dosage: string
+          famille_id: string
+          forme: string
+          id: string
+          nom: string
+          prix_unitaire: number
+          stock_actuel: number
+          stock_minimum: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          dosage: string
+          famille_id: string
+          forme: string
+          id?: string
+          nom: string
+          prix_unitaire?: number
+          stock_actuel?: number
+          stock_minimum?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          dosage?: string
+          famille_id?: string
+          forme?: string
+          id?: string
+          nom?: string
+          prix_unitaire?: number
+          stock_actuel?: number
+          stock_minimum?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicaments_famille_id_fkey"
+            columns: ["famille_id"]
+            isOneToOne: false
+            referencedRelation: "famille_medicaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_specialites: {
+        Row: {
+          created_at: string
+          id: string
+          patient_id: string
+          specialite_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          patient_id: string
+          specialite_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          patient_id?: string
+          specialite_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_specialites_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_specialites_specialite_id_fkey"
+            columns: ["specialite_id"]
+            isOneToOne: false
+            referencedRelation: "specialites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          age: number
+          created_at: string
+          glycemie: string | null
+          id: string
+          imc: number | null
+          medicaments: string | null
+          nom: string
+          notes: string | null
+          poids: number | null
+          prenom: string
+          specialite: string | null
+          ta: string | null
+          taille: number | null
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          created_at?: string
+          glycemie?: string | null
+          id?: string
+          imc?: number | null
+          medicaments?: string | null
+          nom: string
+          notes?: string | null
+          poids?: number | null
+          prenom: string
+          specialite?: string | null
+          ta?: string | null
+          taille?: number | null
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          glycemie?: string | null
+          id?: string
+          imc?: number | null
+          medicaments?: string | null
+          nom?: string
+          notes?: string | null
+          poids?: number | null
+          prenom?: string
+          specialite?: string | null
+          ta?: string | null
+          taille?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      specialites: {
+        Row: {
+          created_at: string
+          id: string
+          nom: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nom: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nom?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
