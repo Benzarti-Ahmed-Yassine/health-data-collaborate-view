@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { TriangleAlert as AlertTriangle, Package, Plus, CreditCard as Edit, Trash2, Loader as Loader2, Pill, Heart, Search } from 'lucide-react';
 import { useMedicaments } from '@/hooks/useMedicaments';
-import type { Medicament, FamilleMedicament } from '@/lib/supabase';
+import type { Medicament, FamilleMedicament } from '@/types/database';
 
 const PharmacyManagement = () => {
   const { medicaments, familles, loading, addMedicament, updateMedicament, updateStock, deleteMedicament, addFamille } = useMedicaments();

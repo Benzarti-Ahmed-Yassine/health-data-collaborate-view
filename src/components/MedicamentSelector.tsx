@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Search, Package, TriangleAlert as AlertTriangle, Plus, Minus } from 'lucide-react';
 import { useMedicaments } from '@/hooks/useMedicaments';
-import type { Medicament } from '@/lib/supabase';
+import type { Medicament } from '@/types/database';
 
 interface MedicamentSelectorProps {
   selectedMedicaments: { medicament: Medicament; quantite: number }[];

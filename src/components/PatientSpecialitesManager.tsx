@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, X, Trash2, Loader2, Save, Download } from 'lucide-react';
 import { useSpecialites } from '@/hooks/useSpecialites';
 import { usePatients } from '@/hooks/usePatients';
-import type { Patient, Specialite } from '@/lib/supabase';
+import type { Patient, Specialite } from '@/types/database';
 
 interface PatientSpecialitesManagerProps {
   patient: Patient;
