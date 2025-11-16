@@ -20,7 +20,8 @@ export const usePatients = () => {
             specialite_id,
             specialites (
               id,
-              nom
+              nom,
+              created_at
             )
           )
         `)
