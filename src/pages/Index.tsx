@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, UserPlus, BarChart3, Activity, Heart } from 'lucide-react';
+import { Users, UserPlus, BarChart3, Activity, Heart, Package } from 'lucide-react';
 import PatientForm from '@/components/PatientForm';
 import PatientList from '@/components/PatientList';
 import AdminDashboard from '@/components/AdminDashboard';

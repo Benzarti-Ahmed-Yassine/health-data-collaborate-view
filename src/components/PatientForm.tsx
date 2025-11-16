@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, Save, Plus, Loader2, Trash2, Heart } from 'lucide-react';
+import { UserPlus, Save, Plus, Loader as Loader2, Trash2, Heart } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useSpecialites } from '@/hooks/useSpecialites';
 
