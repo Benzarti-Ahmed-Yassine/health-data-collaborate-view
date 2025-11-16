@@ -41,3 +41,26 @@ export interface PatientSpecialite {
   created_at: string
   specialite?: Specialite
 }
+
+export interface FamilleMedicament {
+  id: string
+  nom: string
+  description: string
+  created_at: string
+  medicaments?: Medicament[]
+}
+
+export interface Medicament {
+  id: string
+  nom: string
+  famille_id: string
+  dosage: string
+  forme: string
+  stock_actuel: number
+  stock_minimum: number
+  prix_unitaire: number
+  description: string
+  created_at: string
+  updated_at: string
+  famille?: FamilleMedicament
+}
