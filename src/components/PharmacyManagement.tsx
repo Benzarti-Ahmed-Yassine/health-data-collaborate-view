@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertTriangle, Package, Plus, Edit, Trash2, Loader2, Pill, Heart, Search } from 'lucide-react';
+import { TriangleAlert as AlertTriangle, Package, Plus, CreditCard as Edit, Trash2, Loader as Loader2, Pill, Heart, Search } from 'lucide-react';
 import { useMedicaments } from '@/hooks/useMedicaments';
 import type { Medicament, FamilleMedicament } from '@/lib/supabase';
 

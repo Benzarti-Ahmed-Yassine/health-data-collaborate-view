@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Search, Package, AlertTriangle, Plus, Minus } from 'lucide-react';
+import { Search, Package, TriangleAlert as AlertTriangle, Plus, Minus } from 'lucide-react';
 import { useMedicaments } from '@/hooks/useMedicaments';
 import type { Medicament } from '@/lib/supabase';
 
