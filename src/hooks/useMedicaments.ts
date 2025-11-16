@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import type { Medicament, FamilleMedicament } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -9,7 +9,7 @@ export const useMedicaments = () => {
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchMedicaments = async () => {
+  const fetchMedicaments = useCallback(async () => {
     try {
       setLoading(true)
       const { data, error } = await supabase
@@ -37,9 +37,9 @@ export const useMedicaments = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
-  const fetchFamilles = async () => {
+  const fetchFamilles = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('famille_medicaments')
@@ -59,7 +59,7 @@ export const useMedicaments = () => {
         variant: "destructive"
       })
     }
-  }
+  }, [toast])
 
   const addMedicament = async (medicamentData: Omit<Medicament, 'id' | 'created_at' | 'updated_at'>) => {
     try {
@@ -257,7 +257,7 @@ export const useMedicaments = () => {
       medicamentsSubscription.unsubscribe()
       famillesSubscription.unsubscribe()
     }
-  }, [])
+  }, [fetchMedicaments, fetchFamilles])
 
   return {
     medicaments,

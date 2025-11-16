@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import type { Specialite } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -8,7 +8,7 @@ export const useSpecialites = () => {
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchSpecialites = async () => {
+  const fetchSpecialites = useCallback(async () => {
     try {
       setLoading(true)
       const { data, error } = await supabase
@@ -28,7 +28,7 @@ export const useSpecialites = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   const addSpecialite = async (nom: string) => {
     try {
@@ -111,7 +111,7 @@ export const useSpecialites = () => {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [fetchSpecialites])
 
   return {
     specialites,

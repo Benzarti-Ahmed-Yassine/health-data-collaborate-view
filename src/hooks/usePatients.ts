@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import type { Patient, Specialite } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
@@ -8,7 +8,7 @@ export const usePatients = () => {
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     try {
       setLoading(true)
       const { data, error } = await supabase
@@ -46,7 +46,7 @@ export const usePatients = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   const addPatient = async (patientData: Omit<Patient, 'id' | 'created_at' | 'updated_at'>) => {
     try {
@@ -197,7 +197,7 @@ export const usePatients = () => {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [fetchPatients])
 
   return {
     patients,
