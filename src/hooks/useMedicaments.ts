@@ -19,7 +19,8 @@ export const useMedicaments = () => {
           famille:famille_medicaments (
             id,
             nom,
-            description
+            description,
+            created_at
           )
         `)
         .order('nom', { ascending: true })
@@ -70,7 +71,8 @@ export const useMedicaments = () => {
           famille:famille_medicaments (
             id,
             nom,
-            description
+            description,
+            created_at
           )
         `)
         .single()
@@ -105,7 +107,8 @@ export const useMedicaments = () => {
           famille:famille_medicaments (
             id,
             nom,
-            description
+            description,
+            created_at
           )
         `)
         .single()
@@ -142,7 +145,8 @@ export const useMedicaments = () => {
           famille:famille_medicaments (
             id,
             nom,
-            description
+            description,
+            created_at
           )
         `)
         .single()
