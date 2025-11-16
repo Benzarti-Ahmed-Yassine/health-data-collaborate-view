@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, Search, Edit, Trash2, Eye, Loader2, Download, FileText, Heart } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import EditPatientDialog from './EditPatientDialog';
-import type { Patient } from '@/lib/supabase';
+import type { Patient } from '@/types/database';
 
 const PatientList = () => {
   const { patients, loading, deletePatient } = usePatients();

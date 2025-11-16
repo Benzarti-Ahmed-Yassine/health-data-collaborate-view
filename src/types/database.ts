@@ -1,14 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
 // Types for our database tables
 export interface Patient {
   id: string
@@ -25,7 +14,7 @@ export interface Patient {
   notes: string
   created_at: string
   updated_at: string
-  specialites?: Specialite[] // Nouvelles spécialités multiples
+  specialites?: Specialite[]
 }
 
 export interface Specialite {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { supabase, type Specialite } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
+import type { Specialite } from '@/types/database'
 import { useToast } from '@/hooks/use-toast'
 
 export const useSpecialites = () => {

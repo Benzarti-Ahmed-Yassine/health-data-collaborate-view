@@ -10,7 +10,7 @@ import { Save, Plus, Loader2 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useSpecialites } from '@/hooks/useSpecialites';
 import PatientSpecialitesManager from './PatientSpecialitesManager';
-import type { Patient } from '@/lib/supabase';
+import type { Patient } from '@/types/database';
 
 interface EditPatientDialogProps {
   patient: Patient | null;
