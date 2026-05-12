@@ -25,13 +25,13 @@ pillow==10.1.0
 pandas==2.1.3
 openpyxl==3.1.2
 
-# === VOICE (optionnel - peut être simulé) ===
-SpeechRecognition==3.10.0
-pyttsx3==2.90
-pyaudio==0.2.13; platform_system != "Darwin"  # Exclu MacOS si problème
+# === VOICE REMOVED ===
 
-# === VISION (optionnel - peut être simulé) ===
+
+# === VISION (Reconnaissance Faciale Haute Précision) ===
 opencv-contrib-python>=4.8.0
+face-recognition==1.3.0
+dlib==19.24.1
 
 # === UTILITIES ===
 python-dotenv==1.0.0

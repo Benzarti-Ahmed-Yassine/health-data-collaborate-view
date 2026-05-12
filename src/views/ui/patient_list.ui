@@ -10,51 +10,7 @@
     <height>700</height>
    </rect>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget {
-    background-color: #ffffff;
-    color: #262626;
-}
-QLineEdit {
-    background-color: #f5f5f5;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    padding: 8px;
-    color: #262626;
-}
-QLineEdit:focus {
-    border-color: #1890ff;
-    background-color: #ffffff;
-}
-QPushButton#btnAdd {
-    background-color: #1890ff;
-    color: #ffffff;
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 8px 16px;
-}
-QPushButton#btnAdd:hover {
-    background-color: #40a9ff;
-}
-QTableWidget {
-    background-color: #ffffff;
-    border: 1px solid #f0f0f0;
-    gridline-color: #f0f0f0;
-    color: #262626;
-}
-QHeaderView::section {
-    background-color: #ffffff;
-    color: #1890ff;
-    padding: 10px;
-    border: none;
-    border-bottom: 2px solid #1890ff;
-    font-weight: bold;
-}
-QTableWidget::item:selected {
-    background-color: #e6f7ff;
-    color: #1890ff;
-}</string>
-  </property>
+  
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>20</number>
@@ -146,51 +102,7 @@ QTableWidget::item:selected {
    </item>
    <item>
     <widget class="QLabel" name="lblStats">
-     <property name="styleSheet">
-      <string notr="true">QWidget {
-    background-color: #ffffff;
-    color: #262626;
-}
-QLineEdit {
-    background-color: #f5f5f5;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    padding: 8px;
-    color: #262626;
-}
-QLineEdit:focus {
-    border-color: #1890ff;
-    background-color: #ffffff;
-}
-QPushButton#btnAdd {
-    background-color: #1890ff;
-    color: #ffffff;
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 8px 16px;
-}
-QPushButton#btnAdd:hover {
-    background-color: #40a9ff;
-}
-QTableWidget {
-    background-color: #ffffff;
-    border: 1px solid #f0f0f0;
-    gridline-color: #f0f0f0;
-    color: #262626;
-}
-QHeaderView::section {
-    background-color: #ffffff;
-    color: #1890ff;
-    padding: 10px;
-    border: none;
-    border-bottom: 2px solid #1890ff;
-    font-weight: bold;
-}
-QTableWidget::item:selected {
-    background-color: #e6f7ff;
-    color: #1890ff;
-}</string>
-     </property>
+     
      <property name="text">
       <string>0 patient(s) trouvé(s)</string>
      </property>
@@ -201,3 +113,4 @@ QTableWidget::item:selected {
  <resources/>
  <connections/>
 </ui>
+

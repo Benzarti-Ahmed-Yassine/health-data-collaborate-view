@@ -10,32 +10,7 @@
     <height>700</height>
    </rect>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget {
-    background-color: #ffffff;
-    color: #262626;
-}
-QTableWidget {
-    background-color: #ffffff;
-    border: 1px solid #f0f0f0;
-    color: #262626;
-}
-QHeaderView::section {
-    background-color: #ffffff;
-    color: #1890ff;
-    padding: 10px;
-    border: none;
-    border-bottom: 2px solid #1890ff;
-    font-weight: bold;
-}
-QPushButton {
-    background-color: #1890ff;
-    color: #ffffff;
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 8px 16px;
-}</string>
-  </property>
+  
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>20</number>
@@ -72,7 +47,7 @@ QPushButton {
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <set>Qt::Horizontal</set>
+        <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -135,3 +110,4 @@ QPushButton {
  <resources/>
  <connections/>
 </ui>
+

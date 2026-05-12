@@ -58,4 +58,22 @@ except ImportError:
         print("ERREUR: Ni PyQt6 ni PySide6 n'est installé.")
         sys.exit(1)
 
+# Compatibility aliases for Signals and Slots
+if 'QT_LIB' in globals():
+    if QT_LIB == "PyQt6":
+        QtCore.Signal = QtCore.pyqtSignal
+        QtCore.Slot = QtCore.pyqtSlot
+    elif QT_LIB == "PySide6":
+        # PySide6 already uses Signal and Slot
+        pass
+
 print(f"[Qt] Moteur de rendu: {QT_LIB} | Fix visuel activé")
+os.environ["PYQTGRAPH_QT_LIB"] = QT_LIB
+
+# Configuration globale pour éviter les conflits de QPainter sur Windows/PySide6
+if "QtCore" in globals():
+    # Éviter les conflits de painting entre widgets parents/enfants
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
+    # Support haute résolution
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)

@@ -3,14 +3,14 @@
 /* Global Reset */
 QMainWindow, QDialog, QWidget {
     background-color: #ffffff; /* Fond blanc pur */
-    color: #262626;
+    color: #141414; /* Texte sombre pour meilleure lisibilité */
     font-family: 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* Sidebar - Blanc pur */
 QFrame#nav_panel {
     background-color: #ffffff;
-    border-right: 1px solid #e8e8e8; /* Séparateur léger */
+    border-right: 1px solid #e6f7ff; /* Séparateur bleu très clair */
     margin: 0px;
 }
 
@@ -27,7 +27,7 @@ QPushButton {
     padding: 15px 25px;
     background-color: transparent;
     border: none;
-    color: #595959; /* Texte gris foncé sur fond blanc */
+    color: #1890ff; /* Texte bleu sur fond blanc */
     font-size: 11pt;
     border-radius: 0px;
 }
@@ -39,12 +39,12 @@ QPushButton::icon {
 }
 
 QPushButton:hover {
-    color: #1890ff;
-    background-color: rgba(24, 144, 255, 0.1); /* Hover bleu très clair */
+    color: #40a9ff;
+    background-color: #e6f7ff; /* Hover bleu très clair */
 }
 
 QPushButton:checked {
-    background-color: #1890ff;
+    background-color: #40a9ff;
     color: #ffffff;
 }
 
@@ -62,12 +62,12 @@ QFrame.stat_card {
 }
 
 QLabel#card_title {
-    color: #8c8c8c;
+    color: #1890ff;
     font-size: 10pt;
 }
 
 QLabel#card_value {
-    color: #262626;
+    color: #1890ff;
     font-size: 20pt;
     font-weight: bold;
 }
@@ -81,12 +81,12 @@ QTableWidget {
 }
 
 QHeaderView::section {
-    background-color: #ffffff;
+    background-color: #e6f7ff;
     padding: 12px;
     border: none;
-    border-bottom: 2px solid #1890ff; /* Soulignement bleu au lieu de fond gris */
+    border-bottom: 2px solid #1890ff; /* Soulignement bleu */
     font-weight: bold;
-    color: #262626;
+    color: #1890ff;
 }
 
 /* Form Inputs */

@@ -56,17 +56,18 @@ class AdminDashboardWidget(QtWidgets.QWidget):
         
         # Left: Graph
         graph_panel = QtWidgets.QFrame()
-        graph_panel.setStyleSheet("background-color: white; border-radius: 12px; border: 1px solid #f0f0f0;")
+        graph_panel.setObjectName("panel_white")
         graph_layout = QtWidgets.QVBoxLayout(graph_panel)
         graph_layout.addWidget(QtWidgets.QLabel("📈 Activité des utilisateurs (30 derniers jours)"))
         mock_graph = QtWidgets.QLabel()
-        mock_graph.setStyleSheet("background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #1890ff, stop:1 #e6f7ff); border-radius: 8px;")
+        mock_graph = QtWidgets.QLabel()
+        mock_graph.setObjectName("mock_graph")
         graph_layout.addWidget(mock_graph, 1)
         middle_layout.addWidget(graph_panel, 2)
         
         # Right: Roles Pie Chart
         pie_panel = QtWidgets.QFrame()
-        pie_panel.setStyleSheet("background-color: white; border-radius: 12px; border: 1px solid #f0f0f0;")
+        pie_panel.setObjectName("panel_white")
         pie_layout = QtWidgets.QVBoxLayout(pie_panel)
         pie_layout.addWidget(QtWidgets.QLabel("📊 Utilisation des rôles"))
         mock_pie = QtWidgets.QLabel("🔵 Médecins 🔴 Secrétaires 🟡 Admin")

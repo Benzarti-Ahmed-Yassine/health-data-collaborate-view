@@ -34,4 +34,4 @@ La base de données a été totalement reconstruite pour être "Enterprise-Ready
 - **Design** : 95% (Fidèle à l'image de référence MediERP).
 - **Fonctionnalités** : CRUD complet opérationnel, IA connectée, Login fonctionnel.
 
-*Document généré par l'équipe de développement Senior - Mai 2024*
+*Document généré par l'équipe de développement Senior - Mai 2026*

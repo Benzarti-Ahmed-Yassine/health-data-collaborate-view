@@ -12,10 +12,11 @@ class AppointmentItem(QtWidgets.QWidget):
     def __init__(self, time, name, reason, status, photo=None):
         super().__init__()
         layout = QtWidgets.QHBoxLayout(self)
-        layout.setContentsMargins(10, 5, 10, 5)
+        layout.setContentsMargins(15, 10, 15, 10)
+        self.setObjectName("appointment_item")
         
         lbl_time = QtWidgets.QLabel(time)
-        lbl_time.setStyleSheet("font-weight: bold; color: #595959; width: 50px;")
+        lbl_time.setObjectName("appt_time")
         layout.addWidget(lbl_time)
         
         self.avatar = AvatarLabel(size=35)
@@ -24,9 +25,9 @@ class AppointmentItem(QtWidgets.QWidget):
         
         info_layout = QtWidgets.QVBoxLayout()
         lbl_name = QtWidgets.QLabel(name)
-        lbl_name.setStyleSheet("font-weight: 600; color: #262626;")
+        lbl_name.setObjectName("appt_name")
         lbl_reason = QtWidgets.QLabel(reason)
-        lbl_reason.setStyleSheet("color: #8c8c8c; font-size: 9pt;")
+        lbl_reason.setObjectName("appt_reason")
         info_layout.addWidget(lbl_name)
         info_layout.addWidget(lbl_reason)
         layout.addLayout(info_layout)
@@ -47,14 +48,13 @@ class StatCard(QtWidgets.QFrame):
         super().__init__()
         self.setObjectName("stat_card")
         self.setFixedSize(300, 150)
-        self.setStyleSheet(f"background-color: white; border-radius: 12px; border: 1px solid #f0f0f0;")
         
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(20, 20, 20, 20)
         
         header = QtWidgets.QHBoxLayout()
         lbl_title = QtWidgets.QLabel(title)
-        lbl_title.setStyleSheet("color: #8c8c8c; font-size: 10pt;")
+        lbl_title.setStyleSheet("color: #0050b3; font-size: 10pt;")
         header.addWidget(lbl_title)
         header.addStretch()
         lbl_icon = QtWidgets.QLabel(icon)
@@ -63,7 +63,7 @@ class StatCard(QtWidgets.QFrame):
         layout.addLayout(header)
         
         lbl_value = QtWidgets.QLabel(value)
-        lbl_value.setStyleSheet("font-size: 20pt; font-weight: bold; color: #262626;")
+        lbl_value.setStyleSheet("font-size: 20pt; font-weight: bold; color: #0050b3;")
         layout.addWidget(lbl_value)
         
         lbl_sub = QtWidgets.QLabel(subtext)
@@ -77,6 +77,7 @@ class DashboardWidget(QtWidgets.QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
+        self.setObjectName("container")
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(30, 30, 30, 30)
         main_layout.setSpacing(30)
@@ -87,7 +88,8 @@ class DashboardWidget(QtWidgets.QWidget):
         today = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
         
         patients_count = len(self.app.db.fetch_all("SELECT id FROM patients WHERE is_active=1"))
-        rdv_count = len(self.app.db.fetch_all("SELECT id FROM appointments WHERE scheduled_date LIKE ?", (f"{today}%",)))
+        # FIX: Use proper date comparison instead of LIKE to prevent SQL injection
+        rdv_count = len(self.app.db.fetch_all("SELECT id FROM appointments WHERE DATE(scheduled_date) = ?", (today,)))
         factures_count = len(self.app.db.fetch_all("SELECT id FROM invoices WHERE status='En attente'"))
 
         # 1. KPIs dynamiques selon le rôle
@@ -119,10 +121,10 @@ class DashboardWidget(QtWidgets.QWidget):
             SELECT a.scheduled_date, p.first_name, p.last_name, a.status 
             FROM appointments a 
             JOIN patients p ON a.patient_id = p.id
-            WHERE a.scheduled_date LIKE ? 
+            WHERE DATE(a.scheduled_date) = ?
             ORDER BY a.scheduled_date ASC LIMIT 5
         """
-        rdvs = self.app.db.fetch_all(query, (f"{today}%",))
+        rdvs = self.app.db.fetch_all(query, (today,))
         if not rdvs:
             rdv_layout.addWidget(QtWidgets.QLabel("Aucun rendez-vous prévu pour aujourd'hui."))
         else:
@@ -142,7 +144,7 @@ class DashboardWidget(QtWidgets.QWidget):
         # Real graph will be implemented here
         empty_graph = QtWidgets.QLabel("Pas de données disponibles pour les statistiques actuelles.")
         empty_graph.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        empty_graph.setStyleSheet("color: #8c8c8c;")
+        empty_graph.setStyleSheet("color: #0050b3;")
         graph_layout.addWidget(empty_graph, 1)
         
         middle_layout.addWidget(graph_panel, 2)

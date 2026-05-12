@@ -86,10 +86,48 @@ class DatabaseManager:
             return cursor.rowcount > 0
 
     def delete(self, table: str, record_id: int, hard: bool = False) -> bool:
-        if hard:
-            query = f"DELETE FROM {table} WHERE id = ?"
-        else:
-            query = f"UPDATE {table} SET is_active = 0, deleted_at = CURRENT_TIMESTAMP WHERE id = ?"
+        """Supprime un enregistrement. Tente un soft-delete par défaut si possible."""
         with self.transaction() as conn:
+            if not hard:
+                try:
+                    # Tenter un soft delete (désactivation)
+                    query = f"UPDATE {table} SET is_active = 0, deleted_at = CURRENT_TIMESTAMP WHERE id = ?"
+                    cursor = conn.execute(query, (record_id,))
+                    if cursor.rowcount > 0:
+                        return True
+                except sqlite3.OperationalError:
+                    # Si la colonne is_active n'existe pas, on passe au hard delete automatique
+                    pass
+            
+            # Suppression réelle (Hard Delete)
+            query = f"DELETE FROM {table} WHERE id = ?"
             cursor = conn.execute(query, (record_id,))
             return cursor.rowcount > 0
+
+    def execute(self, query: str, params: Tuple = ()) -> int:
+        """Exécute une requête SQL brute (INSERT/UPDATE/DELETE) et retourne lastrowid."""
+        with self.transaction() as conn:
+            cursor = conn.execute(query, params)
+            return cursor.lastrowid
+
+    def apply_migration(self, migration_path: str) -> bool:
+        """Applique un fichier de migration SQL."""
+        import os
+        if not os.path.exists(migration_path):
+            print(f"[Database] Migration introuvable: {migration_path}")
+            return False
+        with open(migration_path, "r", encoding="utf-8") as f:
+            sql = f.read()
+        conn = self._get_connection()
+        try:
+            # Désactiver temporairement les FK pour permettre le drop/rename des tables
+            conn.execute("PRAGMA foreign_keys = OFF")
+            conn.executescript(sql)
+            conn.execute("PRAGMA foreign_keys = ON")
+            conn.commit()
+            print(f"[Database] Migration appliquee: {os.path.basename(migration_path)}")
+            return True
+        except Exception as e:
+            conn.execute("PRAGMA foreign_keys = ON")
+            print(f"[Database] Erreur migration: {e}")
+            return False

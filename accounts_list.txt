@@ -1,0 +1,37 @@
+=== MediERP - Comptes Utilisateurs (Mise à jour Email) ===
+
+Email: benzartiahmedyassine+1@gmail.com
+Role: ADMIN
+Nom: Yassine
+Password: ahmedyassine12*
+---------------------------
+Email: benzartiahmedyassine+2@gmail.com
+Role: DOCTOR
+Nom: Dr. Yassine
+Password: ahmedyassine12*
+---------------------------
+Email: benzartiahmedyassine+3@gmail.com
+Role: SECRETARY
+Nom: Yassine
+Password: ahmedyassine12*
+---------------------------
+Email: benzartiahmedyassine+4@gmail.com
+Role: ASSISTANT
+Nom: Yassine
+Password: ahmedyassine12*
+---------------------------
+Email: benzartiahmedyassine+9@gmail.com
+Role: SECRETARY
+Nom: Marie Secrétaire
+Password: ahmedyassine12*
+---------------------------
+Email: benzartiahmedyassine+72@gmail.com
+Role: DOCTOR
+Nom: ahmed yassine
+Password: ahmedyassine12*
+---------------------------
+Email: benzartiahmedyassine+78@gmail.com
+Role: DOCTOR
+Nom: ahmed yassine
+Password: ahmedyassine12*
+---------------------------

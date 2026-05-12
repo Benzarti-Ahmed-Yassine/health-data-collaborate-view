@@ -13,33 +13,7 @@
   <property name="windowTitle">
    <string>Espace Patient - Smart Medical AI</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QDialog {
-    background-color: #ffffff;
-}
-QLabel {
-    color: #262626;
-}
-QLineEdit {
-    background-color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 6px;
-    padding: 12px;
-    color: #262626;
-}
-QPushButton#btnLogin {
-    background-color: #41cd52;
-    color: #262626;
-    font-weight: bold;
-    border-radius: 6px;
-    padding: 12px;
-}
-QPushButton#btnBack {
-    background-color: transparent;
-    color: #a0a0a0;
-    border: none;
-}</string>
-  </property>
+  
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>20</number>
@@ -66,9 +40,7 @@ QPushButton#btnBack {
        <bold>true</bold>
       </font>
      </property>
-     <property name="styleSheet">
-      <string notr="true">color: #41cd52;</string>
-     </property>
+     
      <property name="text">
       <string>ESPACE PATIENT</string>
      </property>
@@ -93,7 +65,7 @@ QPushButton#btnBack {
    <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
-      <set>Qt::Vertical</set>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -141,7 +113,7 @@ QPushButton#btnBack {
    <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
-      <set>Qt::Vertical</set>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -163,3 +135,4 @@ QPushButton#btnBack {
  <resources/>
  <connections/>
 </ui>
+

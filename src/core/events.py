@@ -16,6 +16,19 @@ class EventType(Enum):
     ALERT_TRIGGERED = "alert.triggered"
     USER_LOGIN = "user.login"
     USER_LOGOUT = "user.logout"
+    INVOICE_CREATED = "invoice.created"
+    INVOICE_UPDATED = "invoice.updated"
+    APPOINTMENT_CREATED = "appointment.created"
+    APPOINTMENT_UPDATED = "appointment.updated"
+    APPOINTMENT_CONFIRMED = "appointment.confirmed"
+    APPOINTMENT_CHANGE_REQUESTED = "appointment.change_requested"
+    VITALS_RECORDED = "vitals.recorded"
+    PATIENT_ARRIVED = "patient.arrived"
+    MATERIAL_REQUESTED = "material.requested"
+    MATERIAL_APPROVED = "material.approved"
+    MESSAGE_SENT = "message.sent"
+    PRESCRIPTION_CREATED = "prescription.created"
+
 
 
 class EventBus:

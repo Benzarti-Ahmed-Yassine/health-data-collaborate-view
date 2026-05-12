@@ -194,7 +194,9 @@ CREATE TABLE IF NOT EXISTS appointments (
     doctor_id INTEGER,
     scheduled_date DATE,
     scheduled_time TIME,
-    status TEXT,
+    status TEXT DEFAULT 'CONFIRMED', -- 'CONFIRMED', 'CANCELLED', 'CHANGE_REQUESTED', 'COMPLETED'
+    pending_date DATE,
+    pending_time TIME,
     FOREIGN KEY(patient_id) REFERENCES patients(id),
     FOREIGN KEY(doctor_id) REFERENCES users(id)
 );
@@ -240,22 +242,12 @@ CREATE TABLE IF NOT EXISTS medical_documents (
     file_path TEXT,
     file_type TEXT,
     category TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(patient_id) REFERENCES patients(id)
 );
 
--- ============================================
--- NOTIFICATIONS
--- ============================================
+-- MESSAGES & NOTIFICATIONS REMOVED
 
-CREATE TABLE IF NOT EXISTS notifications (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    title TEXT,
-    message TEXT,
-    is_read BOOLEAN DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-);
 
 -- ============================================
 -- AI / ML
@@ -313,9 +305,10 @@ FROM patients p;
 -- SEED DATA
 -- ============================================
 
-INSERT OR IGNORE INTO roles (name) VALUES ('ADMIN'), ('DOCTOR'), ('ASSISTANT');
+INSERT OR IGNORE INTO roles (name) VALUES ('ADMIN'), ('DOCTOR'), ('SECRETARY'), ('ASSISTANT');
 
 INSERT OR IGNORE INTO users (email, password_hash, full_name, role) VALUES
-('admin@local', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Administrateur Système', 'ADMIN'),
-('yassine@medierp.ai', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Dr. Yassine', 'DOCTOR'),
-('assistant@medierp.ai', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Secrétaire', 'ASSISTANT');
+('yassine.admin@medierp.ai', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Yassine', 'ADMIN'),
+('yassine.doctor@medierp.ai', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Dr. Yassine', 'DOCTOR'),
+('yassine.secretary@medierp.ai', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Yassine', 'SECRETARY'),
+('yassine.assistant@medierp.ai', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.VTtYA.qGZvKG6G', 'Yassine', 'ASSISTANT');

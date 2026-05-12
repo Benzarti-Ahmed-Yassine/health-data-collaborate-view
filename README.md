@@ -8,11 +8,12 @@
 
 ## ✨ Points Forts
 - 🎨 **Design Premium** — Interface "Full Light" épurée, moderne et intuitive (PySide6).
-- 🤖 **IA Prédictive** — Analyse des risques cardiaques via Machine Learning (Scikit-learn).
-- 🔐 **Sécurité Biométrique** — Authentification par reconnaissance faciale et vocale.
-- 🎤 **Dictée Vocale** — Assistant intelligent pour la saisie des consultations.
-- 🔒 **Sécurité Avancée** — Chiffrement des données et authentification forte.
-- 📊 **Gestion Patients** — Dossiers complets, antécédents et suivi cardiologique.
+- 🛡️ **Système RBAC "Antigravity"** — 5 rôles distincts avec espaces dédiés : Administrateur, Médecin, Secrétaire, Assistant, et Patient.
+- 🔄 **Workflow Connecté** — Flux complet : Arrivée ➡️ Prise de constantes (Assistant) ➡️ Consultation IA (Médecin) ➡️ Facturation (Secrétaire).
+- 🤖 **IA Prédictive** — Analyse des risques cardiaques via Machine Learning (Scikit-learn) intégrée à la consultation.
+- 🔐 **Sécurité Multi-Facteurs** — Authentification par mot de passe robuste, avec reconnaissance faciale et vocale.
+- 📊 **Gestion des Stocks** — Suivi de l'inventaire médical (vaccins, matériel) avec alertes de seuil par l'Assistant.
+- 📱 **Portail Patient** — Espace en ligne simulé pour suivre ses rendez-vous, ordonnances et constantes.
 
 ---
 

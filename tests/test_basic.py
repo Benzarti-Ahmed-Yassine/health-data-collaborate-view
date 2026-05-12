@@ -46,7 +46,7 @@ class TestSecurity:
 
     def test_authentication(self):
         sec = SecurityManager()
-        result = sec.authenticate("didier@smartmedical.ai", "didier2024")
+        result = sec.authenticate("didier@smartmedical.ai", "didier2026")
         assert result is not None
         assert result["role"] == "DOCTOR"
 
